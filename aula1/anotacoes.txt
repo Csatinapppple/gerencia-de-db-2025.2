@@ -1,0 +1,43 @@
+modelo de dados:
+	Definicao formal de uma estrutura (projeto arquitetonico) e como elas se relacionam.
+	Um bom modelo evita re-trabalho e propoe um melhor entendimento da estrutura.
+	- Conceitual (Comeco)
+	- Logico (Meio)
+	- Fisico (Fim)
+
+o que é um sistema de gerencia de banco de dados?
+	é o software que é usado para manusear um bacno de dados
+	Não o banco de dados em si.
+
+Dados:
+	-estruturados sao dados com esquema rigido conhecidos a priori
+	-Nao-Estruturados
+	-Semi estruturados
+
+Atividade:
+
+Exercício – Arquitetura Três Camadas na Prática
+Enunciado:
+Imagine que você está participando da equipe de desenvolvimento de um sistema online de matrícula em disciplinas para uma universidade.
+Esse sistema deverá permitir:
+Que alunos acessem uma interface para ver e escolher disciplinas.
+Que o sistema aplique regras como “não permitir matrícula em disciplinas com choque de horário”.
+Que os dados das disciplinas, alunos e matrículas sejam armazenados com segurança em um banco de dados.
+Sua tarefa é:
+Desenhar (ou descrever em texto) as três camadas do sistema, indicando:
+O que estará na Camada de Apresentação (View)
+O que estará na Camada de Aplicação (Controller/Lógica de negócio)
+O que estará na Camada de Dados (Model / Banco de dados)
+Dê um exemplo de interação do usuário, descrevendo passo a passo o caminho que a requisição percorre desde a interface até o banco de dados e de volta (Ex: aluno clica em “matricular-se na disciplina X”).
+Explique por que essa separação em camadas é importante nesse tipo de sistema.
+
+
+View:
+	Tera um calendario mostrando qual dia a materia ocupara e a opcao de escolher ela, se tiver conflitos, devera ficar vermelho com um X de erro no dia que as materias conflitantes se encontram.
+
+Controller:
+	Devera pegar os dados das matriculas e oferecer para serem escolhidas na view, se a aplicacao detectar conflito de agenda, devera retornar um erro para a view.
+
+Model:
+	deveria ter uma tabela de disciplinas, nelas contem o horario, os cursos associados a elas e seu peso academico.
+	
