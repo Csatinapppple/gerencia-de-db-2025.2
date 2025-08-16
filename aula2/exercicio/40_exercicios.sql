@@ -130,6 +130,9 @@ INSERT INTO movimentos_estoque (produto_id, tipo, quantidade, motivo) VALUES
 
 --4) Criar índice composto em `pedido_itens` (por produto e qtd).
 --CREATE INDEX ix_pi_prod_qtd ON pedido_itens (produto_id, qtd);
+--Resposta no arquivo ex4.sql
+
+
 --5) Remover índice criado no exercício anterior.
 --DROP INDEX ix_pi_prod_qtd ON pedido_itens;
 --6) Renomear tabela `fornecedores` para `forns`.
