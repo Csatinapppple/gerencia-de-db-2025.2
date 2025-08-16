@@ -129,17 +129,18 @@ INSERT INTO movimentos_estoque (produto_id, tipo, quantidade, motivo) VALUES
 --resposta no arquivo ex3.sql
 
 --4) Criar índice composto em `pedido_itens` (por produto e qtd).
---CREATE INDEX ix_pi_prod_qtd ON pedido_itens (produto_id, qtd);
 --Resposta no arquivo ex4.sql
 
 
 --5) Remover índice criado no exercício anterior.
---DROP INDEX ix_pi_prod_qtd ON pedido_itens;
+--Resposta no arquivo ex5.sql
+
 --6) Renomear tabela `fornecedores` para `forns`.
---RENAME TABLE fornecedores TO forns;
+--resposta no arquivo ex6.sql
+
 --7) Adicionar constraint CHECK para e-mail.
---ALTER TABLE clientes
---ADD CONSTRAINT chk_email_formato CHECK (email LIKE '%@%.__%');
+--resposta no arquivo ex7.sql
+
 --8) Criar VIEW de faturamento por pedido.
 --CREATE OR REPLACE VIEW vw_pedido_total AS (...);
 ---
