@@ -11,11 +11,10 @@ UPDATE conta SET valor = valor + 200 WHERE id = 2;
 -- Verifique os saldos dentro da transação
 SELECT * FROM conta;
 
--- Em outra sessão (Sessão 2) - os valores não serão visíveis ainda
-SELECT * FROM conta;
-
 -- Volte para Sessão 1 e faça COMMIT
 COMMIT;
+
+-- Sessão 2
 
 -- Agora em Sessão 2 os valores atualizados serão visíveis
 SELECT * FROM conta;
@@ -29,6 +28,12 @@ ROLLBACK; -- Desfaz todas as alterações
 
 -- Verifique que os valores voltaram ao original
 SELECT * FROM conta;
+
+/*
+	Se fizer o select dentro da primeira sessão após os UPDATEs, sera visivel as mudanças feitas
+	mas se voce fizer um SELECT em outra Sessão, uma conexao diferente vendo o banco, não
+	haverá mudanças ate o COMMIT da primeira sessão ser feito.
+ */
 
 -- 2) DEADLOCK NA PRÁTICA COM FOR UPDATE
 -- Sessão 1: START TRANSACTION; SELECT * FROM contas WHERE id=1 FOR UPDATE; Sessão
