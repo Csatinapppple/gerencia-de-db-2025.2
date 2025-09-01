@@ -1,0 +1,13 @@
+CREATE DATABASE IF NOT EXISTS banco2 CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+
+USE banco2;
+
+CREATE TABLE IF NOT EXISTS contas (
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	saldo DECIMAL(10,2) NOT NULL check( valor >= 0.00)
+);
+
+
+INSERT INTO contas (saldo) VALUES
+(200.0),
+(300.0);

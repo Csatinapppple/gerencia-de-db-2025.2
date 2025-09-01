@@ -1,0 +1,24 @@
+ CREATE DATABASE IF NOT EXISTS banco CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+ USE banco;
+ 
+CREATE TABLE IF NOT EXISTS  conta (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  numero VARCHAR(9) NOT NULL,
+  valor DECIMAL(10,2) NOT NULL check(valor >= 0.00)
+);
+ 
+INSERT INTO conta (numero, valor) VALUES
+	(123456789, 150.05),
+	(847554687, 18780.78);
+
+ 
+CREATE TABLE IF NOT EXISTS  Item (
+  id VARCHAR(15) PRIMARY KEY,
+  nome VARCHAR(9) NOT NULL,
+  estoque INT NOT NULL
+);
+ 
+INSERT INTO Item (id, nome, estoque) VALUES
+	('T000154', 'TESTE', 150);
+ 
+ 
