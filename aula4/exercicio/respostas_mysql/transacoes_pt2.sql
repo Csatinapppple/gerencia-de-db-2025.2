@@ -4,7 +4,31 @@
 -- e fora da transação (em outra sessão). Finalize com COMMIT e repita depois fazendo ROLLBACK.
 -- Observe os saldos.
 
+-- Sessão 1
+START TRANSACTION;
+UPDATE conta SET valor = valor - 200 WHERE id = 1;
+UPDATE conta SET valor = valor + 200 WHERE id = 2;
+-- Verifique os saldos dentro da transação
+SELECT * FROM conta;
 
+-- Em outra sessão (Sessão 2) - os valores não serão visíveis ainda
+SELECT * FROM conta;
+
+-- Volte para Sessão 1 e faça COMMIT
+COMMIT;
+
+-- Agora em Sessão 2 os valores atualizados serão visíveis
+SELECT * FROM conta;
+
+-- Para testar ROLLBACK, repita mas faça ROLLBACK ao invés de COMMIT
+START TRANSACTION;
+UPDATE conta SET valor = valor - 200 WHERE id = 1;
+UPDATE conta SET valor = valor + 200 WHERE id = 2;
+SELECT * FROM conta; -- Mostra valores atualizados
+ROLLBACK; -- Desfaz todas as alterações
+
+-- Verifique que os valores voltaram ao original
+SELECT * FROM conta;
 
 -- 2) DEADLOCK NA PRÁTICA COM FOR UPDATE
 -- Sessão 1: START TRANSACTION; SELECT * FROM contas WHERE id=1 FOR UPDATE; Sessão

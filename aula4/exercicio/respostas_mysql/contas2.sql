@@ -1,3 +1,5 @@
+-- usar com a parte 2 do exercicio de transacoes
+
 CREATE DATABASE IF NOT EXISTS banco2 CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 
 USE banco2;
