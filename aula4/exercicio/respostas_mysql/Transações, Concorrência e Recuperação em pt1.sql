@@ -1,4 +1,6 @@
- USE banco;
+-- usar o Contas.sql para criar a base de dados usada nesse exercicio 
+
+USE banco;
 -- 1. Escreva um exemplo SQL de transação que transfira R$ 200 da conta A para a conta B. Mostre como ficariam os comandos BEGIN, COMMIT e ROLLBACK.
 
 DELIMITER //
