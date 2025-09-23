@@ -1,839 +1,418 @@
 /* **************************************************************************/
-
 /*    Estabelecendo uma Conexão                                                       */
-
 /*    com o Database Exemplo                                                       */
-
 /* **************************************************************************/
-
 USE  Exemplo
-
 GO
-
 /* **************************************************************************/
-
 /*   Criando as Procedures que geram dados para as Tabelas      */
-
 /* **************************************************************************/
-
 CREATE PROCEDURE P_GeraDadosFuncionario
-
 AS
-
 ALTER TABLE Funcionario
-
 NOCHECK CONSTRAINT CH_Func1
 
- 
-
 INSERT Funcionario VALUES('Antonio Antonino Antones','01/02/00','M',1500.00,'Rua A      ')
-
 INSERT Funcionario VALUES('Amaro Merico Vespucio','02/02/00','M',2500.00,'Rua B')
-
 INSERT Funcionario VALUES('Abílio Abel Garcia','03/02/01','M',1000.00,'Rua C')
-
 INSERT Funcionario VALUES('Bia Bianca Bones','04/03/01','F',5000.25,'Rua D')
-
 INSERT Funcionario VALUES('Beatriz Bertioga','05/05/01','F',300.00,'Rua E')
-
 INSERT Funcionario VALUES('Caio Cesar Cearez','06/05/01','M',250.00,',Rua F')
-
 INSERT Funcionario VALUES('Celso Cesare','07/06/01','M',1542.36,'Rua J')
-
 INSERT Funcionario VALUES('Danilo Douglas','08/06/01','M',1524.56,'Rua K')
-
 INSERT Funcionario VALUES('Denis Denilo','09/07/01','M',5235.56,'Rua L')
-
 INSERT Funcionario VALUES('Everton Evaristo','10/07/01','M',2542.25,'Rua M')
-
 INSERT Funcionario VALUES('Evanir Eva','11/08/01','M',4523.54,'Rua N')
-
 INSERT Funcionario VALUES('Fabio Fabricio','12/08/01','M',1524.25,'Rua O')
-
 INSERT Funcionario VALUES('Fabiola Fabiolo','02/01/02','F',2554.25,'Rua P')
-
 INSERT Funcionario VALUES('Geraldo Gomes','03/010/02','M',1542.25,'Rua Q')
-
 INSERT Funcionario VALUES('Helio Heliópolis','04/01/02','M',1542.23,'Rua R')
-
 INSERT Funcionario VALUES('Irineu Irene','05/02/02','M',2523.00,'Rua S')
-
 INSERT Funcionario VALUES('Jonas jackes','05/02/02','M',2500.00,'Rua T')
-
 INSERT Funcionario VALUES('Leandro Lago','06/02/02','M',1500.00,'Rua U')
-
 INSERT Funcionario VALUES('Lucio Lacio','07/03/02','M',2500.00,'Rua V')
-
 INSERT Funcionario VALUES('Lecio Licio','08/04/02','M',1420.00,'Rua X')
-
 INSERT Funcionario VALUES('Mario Mendes','06/02/02','M',1262.00,'Rua W')
-
 INSERT Funcionario VALUES('Olavo Odavlas','07/07/02','M',1540.00,'Rua Y')
 
 ALTER TABLE Funcionario
-
 CHECK CONSTRAINT CH_Func1
-
 GO
-
 /* ***************************************************************************************************** */
-
 /* ***************************************************************************************************** */
-
 CREATE PROCEDURE P_GeraDadosBonus  
-
 @Val_Bonus decimal(10,2)
-
 AS
-
 ALTER TABLE Bonus
-
 NOCHECK CONSTRAINT CH_Bonus1
-
  
-
 DECLARE @Cod_Func int
-
 DECLARE Cursor_Funcionario CURSOR
-
 FOR SELECT Cod_Func FROM Funcionario
-
  
-
 OPEN Cursor_Funcionario
-
  
-
 FETCH NEXT FROM Cursor_Funcionario INTO @Cod_Func
-
  
-
 WHILE @@Fetch_Status = 0
-
 BEGIN
-
    INSERT Bonus(Cod_Func,Data_Bonus,Val_Bonus)
-
     VALUES(@Cod_Func,getdate()-30,@Val_Bonus)
-
  
-
     FETCH NEXT FROM Cursor_Funcionario INTO @Cod_Func
-
 END
-
 DEALLOCATE Cursor_Funcionario
-
 ALTER TABLE Bonus
-
 NOCHECK CONSTRAINT CH_Bonus1
-
 GO
-
 /* ***************************************************************************************************** */
-
 /* ***************************************************************************************************** */
-
 CREATE PROCEDURE P_GeraDadosPontuacao
-
 @Val_Pontos decimal(10,2),
-
 @Cod_Func1 int,
-
 @Cod_Func2 int
-
 AS
-
- 
-
 ALTER TABLE Pontuacao
-
 NOCHECK CONSTRAINT CH_Pto1
-
  
-
 DECLARE @Cod_Func int
-
 DECLARE Cursor_Funcionario CURSOR
-
 FOR SELECT Cod_Func FROM Funcionario
-
         WHERE Cod_Func BETWEEN @Cod_Func1 AND @Cod_Func2      
-
  
-
 OPEN Cursor_Funcionario
-
- 
-
 FETCH NEXT FROM Cursor_Funcionario INTO @Cod_Func
-
- 
-
 WHILE (@@Fetch_Status = 0)
-
 BEGIN
-
     INSERT Pontuacao(Cod_Func,Data_Pto,Pto_Func)
-
     VALUES(@Cod_Func,getdate()-30,@Val_Pontos)
-
     FETCH NEXT FROM Cursor_Funcionario INTO @Cod_Func
-
 END
-
 DEALLOCATE Cursor_Funcionario
-
 ALTER TABLE Pontuacao
-
 NOCHECK CONSTRAINT CH_Pto1
-
 GO
-
 /* ***************************************************************************************************** */
-
 /* ***************************************************************************************************** */
-
 CREATE PROCEDURE P_GeraDadosHistorico
-
 AS
-
 ALTER TABLE Historico
-
 NOCHECK CONSTRAINT CH_Hist1
-
 INSERT Historico
-
 SELECT Cod_Func,Getdate() - 30,
-
               Convert(Decimal(10,2),Sal_Func/2),
-
               Sal_Func
-
 FROM Funcionario
-
 ALTER TABLE Historico
-
 CHECK CONSTRAINT CH_Hist1
-
 GO
-
 /* ***************************************************************************************************** */
-
 /* ***************************************************************************************************** */
-
 GO
-
 CREATE PROCEDURE P_GeraDadosPedido
-
 AS
-
 ALTER TABLE Pedido
-
 NOCHECK CONSTRAINT CH_Pedido1,FK_Pedido1,FK_Pedido2
-
  
-
 DECLARE @Cod_Func int,
-
                     @Cod_Cli    int,
-
                     @Cod_Sta   int,
-
                     @Data Varchar(255),
-
                     @DataPed smalldatetime,
-
                     @Cod_CliLim    int,
-
                     @Cod_StaLim   int,
-
                     @Cod_FuncLim int
-
  
-
 SELECT @Cod_FuncLim = Max(Cod_Func) FROM Funcionario
-
 SELECT @Cod_CliLim = Max(Cod_Cli) FROM Cliente
-
 SELECT @Cod_StaLim = Max(Cod_Sta) FROM StatusPedido
-
  
-
 SET @Cod_Func = 1
-
 SET @Cod_Cli = 1
-
 SET @Cod_Sta = 1
-
  
-
 WHILE @Cod_Func < @Cod_FuncLim
-
 BEGIN
-
    WHILE @Cod_Cli < @Cod_CliLim
-
    BEGIN   
-
           WHILE @Cod_Sta <= @Cod_StaLim
-
           BEGIN
-
                   SET @Data = CONVERT(Char(02),MONTH(DATEADD(mm,@Cod_Sta*2,Getdate())))
-
                   SET @Data = @Data + '/' + CONVERT(Char(02),DAY(GETDATE() -@Cod_Sta*3))
-
                   SET @Data = @Data + '/' + CONVERT(Char(04),YEAR(DATEADD(YY,-1*@Cod_Sta,GETDATE())))
-
                   SET @DataPed = Convert(smalldatetime,@Data)              
-
                   INSERT Pedido VALUES(@Cod_Cli,@Cod_Func,@Cod_Sta,@Data,100*@Cod_Cli)
-
                   SET @Cod_Sta = @Cod_Sta + 1
-
           END
-
           SET @Cod_Cli = @Cod_Cli + 1
-
           SET @Cod_Sta = 1
-
     END
-
    SET @Cod_Func = @Cod_Func + 1
-
    SET @Cod_Cli = 1
-
 END
-
 ALTER TABLE Pedido
-
 NOCHECK CONSTRAINT CH_Pedido1,FK_Pedido1,FK_Pedido2
-
 GO
-
 /* ***************************************************************************************************** */
-
 /* ***************************************************************************************************** */
-
 CREATE PROCEDURE P_Parcelas
-
 @Val_Lim1 decimal(10,2),
-
 @Val_Lim2 decimal(10,2),
-
 @NumPar int
-
 AS
-
 ALTER TABLE PARCELA
-
 NOCHECK CONSTRAINT CH_Parcela1
-
  
-
 DECLARE @Tabela TABLE
-
                    ( Linha  int identity,
-
                      Num_Par smallint,
-
                      Num_Ped int,
-
                      Data_Venc smalldatetime,
-
                      Val_Ped decimal(10,2),
-
                      Val_Par decimal(10,2),
-
                      Data_Pgto smalldatetime,
-
                      Val_Pgto decimal(10,2))
-
 DECLARE @Cont int,
-
                     @TotLim int,
-
                     @Cont2 int
-
 SET @Cont = 1
-
 SET @Cont2 = 1
-
  
-
 INSERT @Tabela
-
 SELECT null,Num_Ped,Data_Ped,Val_Ped,Convert(Decimal(10,2),Val_Ped/3),null,null FROM PEDIDO
-
 WHERE Val_Ped between @Val_Lim1 AND @Val_Lim2
-
  
-
 SELECT @TotLim = Count(*) from @Tabela
-
  
-
 WHILE @Cont <= @TotLim
-
 BEGIN
-
     
-
       WHILE @Cont2 <= @NumPar     
-
       BEGIN
-
                    UPDATE @Tabela
-
                    SET Num_Par = @Cont2,
-
                             Data_Venc = Data_Venc+ @Cont2,
-
                             Val_Pgto = Val_Par,
-
                              Data_Pgto = Data_Venc
-
                    WHERE Linha = @Cont
-
  
-
                     SET @Cont2 = @Cont2 + 1
-
  
-
                     SET @Cont = @Cont + 1
-
      END
-
-  
-
      SET @Cont2 = 1
-
 END
-
 INSERT Parcela
-
   SELECT   Num_Par, Num_Ped, Data_Venc,Val_Par,Data_Pgto FROM @Tabela
-
 ALTER TABLE PARCELA
-
 CHECK CONSTRAINT CH_Parcela1
-
 GO
-
 /* ***************************************************************************************************** */
-
 /* ***************************************************************************************************** */
-
 CREATE PROCEDURE P_GeraDadosItens
-
 @Cod1 int,
-
 @Cod2 int,
-
 @Qtd   int
-
 AS
-
 INSERT Itens
-
 SELECT Pedido.Num_Ped,
-
               Produto.Cod_Prod,
-
               @Qtd,
-
               Produto.Val_UnitProd
-
 FROM Pedido CROSS JOIN Produto
-
 WHERE Pedido.Num_Ped BETWEEN @Cod1 AND @Cod2
-
 GO
-
 /* ***************************************************************************************************** */
-
 /* Inserindo dados diretamente nas tabelas e com a execução das procedures criadas       */
-
 /* anteriormente neste script                                                                                                           */
-
 /* ***************************************************************************************************** */
-
  
-
 INSERT TipoEnd VALUES('Entrega')
-
 INSERT TipoEnd VALUES('Faturamento')
-
 INSERT TipoEnd VALUES('Correspondência')
-
 INSERT TipoEnd VALUES('Cobrança')
-
 INSERT TipoEnd VALUES('Residential')
-
 INSERT TipoEnd VALUES('Comercial')
-
 GO
-
  
-
 INSERT Estado VALUES('AC','Acre')
-
 INSERT Estado VALUES('AL','Alagoas')
-
 INSERT Estado VALUES('AM','Amazonas')
-
 INSERT Estado VALUES('AP','Amapa')
-
 INSERT Estado VALUES('BA','Bahia')
-
 INSERT Estado VALUES('CE','Ceará')
-
 INSERT Estado VALUES('DF','Destrito Federal')
-
 INSERT Estado VALUES('ES','Espirito Santo')
-
 INSERT Estado VALUES('GO','Goias')
-
 INSERT Estado VALUES('MA','Maranhão')
-
 INSERT Estado VALUES('MG','Minas Gerais')
-
 INSERT Estado VALUES('MS','Mato Grosso do Sul')
-
 INSERT Estado VALUES('MT','Mato Grosso do Norte')
-
 INSERT Estado VALUES('PB','Paraíba')
-
 INSERT Estado VALUES('PE','Pernambuco')
-
 INSERT Estado VALUES('PI','Piauí')
-
 INSERT Estado VALUES('PR','Paraná')
-
 INSERT Estado VALUES('RJ','Rio de Janeiro')
-
 INSERT Estado VALUES('RN','Rio Grande do Norte')
-
 INSERT Estado VALUES('RO','Rondônia')
-
 INSERT Estado VALUES('RR','Roraima')
-
 INSERT Estado VALUES('RS','Rio Grande do Sul')
-
 INSERT Estado VALUES('SC','Santa Catarina')
-
 INSERT Estado VALUES('SE','Sergipe')
-
 INSERT Estado VALUES('SP','São Paulo')
-
 INSERT Estado VALUES('TO','Tocantins')
-
  
-
 GO
-
 INSERT Cidade VALUES('SP','Araraquara')
-
 INSERT Cidade VALUES('SP','Americana')
-
 INSERT Cidade VALUES('SP','Araçatuba')
-
 INSERT Cidade VALUES('SP','Fernandópolis')
-
 INSERT Cidade VALUES('SP','Jundiaí')
-
 INSERT Cidade VALUES('SP','Sorocaba')
-
 INSERT Cidade VALUES('SP','São José do Rio Preto')
-
 GO
-
  
-
 INSERT TipoCli VALUES('Diamante')
-
 INSERT TipoCli VALUES('Ouro')
-
 INSERT TipoCli VALUES('Prata')
-
 INSERT TipoCli VALUES('Bronze')
-
 INSERT TipoCli VALUES('Cobre')
-
 INSERT TipoCli VALUES('Zinco')
-
  
-
 GO
-
 INSERT Cliente VALUES(1,'João Carlos','01/01/1999',10000,'M')
-
 INSERT Cliente VALUES(1,'Daniel Souza','02/02/1999',10000,'M')
-
 INSERT Cliente VALUES(1,'Helena Oliveira','03/03/1999',9000,'F')
-
 INSERT Cliente VALUES(1,'Roberta Oliveira','04/04/1999',8000,'F')
-
 INSERT Cliente VALUES(2,'Renata Leão','05/05/1999',5000,'F')
-
 INSERT Cliente VALUES(2,'Jairo Gato','06/06/1999',4000,'M')
-
 INSERT Cliente VALUES(3,'Fernando Gato','07/07/1999',3000,'M')
-
 INSERT Cliente VALUES(3,'Giovanna Silva Leão','08/08/1999',3000,'F')
-
 INSERT Cliente VALUES(4,'Lucas Ribeiro','09/09/1999',2000,'M')
-
 INSERT Cliente VALUES(3,'Helder Leão','10/10/1999',2000,'M')
-
 INSERT Cliente VALUES(2,'Olga Cristina Bonfiglioli','11/11/1999',8000,'F')
-
 INSERT Cliente VALUES(1,'Maria Cristina Bonfiglioli Martins de Souza Santos','12/12/1999',5000,'F')
-
 INSERT Cliente VALUES(1,'Salvador Eneas Feredico','01/13/1999',9000,'M')
-
 INSERT Cliente VALUES(1,'Dolores Gerreiro Martins','02/14/2000',8000,'F')
-
 INSERT Cliente VALUES(1,'Fabiana Bataglin','03/15/2000',5000,'F')
-
 INSERT Cliente VALUES(2,'Aparecida Ribeiro','04/16/2000',3000,'F')
-
 INSERT Cliente VALUES(3,'Reginaldo Ribeiro','05/17/2000',4000,'M')
-
 INSERT Cliente VALUES(4,'Suellen M Nunes','06/18/2000',3000,'F')
-
 INSERT Cliente VALUES(1,'Carlos Alberto','07/19/2000',2000,'M')
-
 INSERT Cliente VALUES(2,'Roberto Arruda','08/20/2000',1000,'M')
-
 INSERT Cliente VALUES(3,'Sandra Medeiros','09/21/2000',1500,'F')
-
 INSERT Cliente VALUES(4,'Alice Santos','10/22/2001',2500,'F')
-
 INSERT Cliente VALUES(5,'Valter Sanches','11/23/2001',3500,'M')
-
 INSERT Cliente VALUES(6,'Pascoal Babiera','12/24/2001',1525,'M')
-
 INSERT Cliente VALUES(1,'Lucia Bacalla','01/25/2001',6321,'F')
-
 INSERT Cliente VALUES(3,'Maria Belido','02/26/2001',5412,'F')
-
 INSERT Cliente VALUES(4,'Hamilton Belico','03/26/2001',2563,'M')
-
 INSERT Cliente VALUES(5,'Alberto Belli','04/27/2001',2412,'M')
-
 INSERT Cliente VALUES(6,'Marcia Bueno','05/28/2001',1235,'F')
-
 INSERT Cliente VALUES(1,'Maria Catta','06/29/2001',1236,'F')
-
 INSERT Cliente VALUES(2,'Carlos Cattaneo','07/30/2001',1253,'M')
-
 INSERT Cliente VALUES(3,'Andre Caula','08/31/2001',1524,'M')
-
 INSERT Cliente VALUES(4,'Fabia Dávello','09/01/2001',1236,'F')
-
 INSERT Cliente VALUES(5,'Afonso Ferraro','10/02/2001',1256,'M')
-
 INSERT Cliente VALUES(6,'Akemi Fukamizu','11/03/2001',1452,'F')
-
 INSERT Cliente VALUES(1,'Bernadino Gomes','12/04/2001',11785,'M')
-
 INSERT Cliente VALUES(2,'Regiani Hoki','01/05/2001',1524,'F')
-
 INSERT Cliente VALUES(3,'Valter Koszura','02/06/2001',1256,'M')
-
 INSERT Cliente VALUES(4,'Alexandre Kozeki','03/07/2001',1225,'M')
-
 INSERT Cliente VALUES(5,'Vittorio Lannocca','04/08/2001',1253,'M')
-
 INSERT Cliente VALUES(6,'Domingos Lanini','05/09/2002',1253,'M')
-
 INSERT Cliente VALUES(1,'Paulo Mello','06/10/2001',10000,'M')
-
 INSERT Cliente VALUES(2,'Zilda Mellone','07/11/2001',8000,'F')
-
 INSERT Cliente VALUES(3,'Marlene Moura','08/12/2001',3000,'F')
-
 INSERT Cliente VALUES(4,'Francisca Oliveira','09/13/2001',2300,'F')
-
 INSERT Cliente VALUES(5,'Marlene Pereira','10/14/2001',2562,'F')
-
 INSERT Cliente VALUES(6,'Milton Pereira','11/15/2001',2563,'M')
-
 INSERT Cliente VALUES(1,'Ligia Ramos','12/16/2001',9200,'F')
-
 INSERT Cliente VALUES(2,'Mariangela Ramos','01/17/2001',7000,'F')
-
 INSERT Cliente VALUES(3,'Dora Romariz','02/18/2001',5263,'F')
-
 INSERT Cliente VALUES(4,'Paulino Romelli','03/19/2001',5428,'M')
-
 INSERT Cliente VALUES(5,'Fernando Sampaio','04/20/2001',2023,'M')
-
 INSERT Cliente VALUES(6,'José Sampaio','05/21/2001',2235,'M')
-
 INSERT Cliente VALUES(1,'Vicenzo Senatori','06/22/2001',7000,'M')
-
 INSERT Cliente VALUES(2,'Geraldo Senedeze','07/23/2001',2531,'M')
-
 INSERT Cliente VALUES(3,'Mauro Soares','08/24/2001',2532,'M')
-
 INSERT Cliente VALUES(4,'Paulo Souza','09/25/2001',2542,'M')
-
 INSERT Cliente VALUES(5,'Emidio Trifoni','10/26/2001',2563,'M')
-
 INSERT Cliente VALUES(6,'Heitor Vernile','11/27/2001',2542,'M')
-
 INSERT Cliente VALUES(1,'Carlos Saura','12/28/2001',6000,'M')
-
 INSERT Cliente VALUES(2,'Angelino Saullo','01/29/2001',5000,'M')
-
 INSERT Cliente VALUES(3,'Aldo Savazzoni','02/28/2001',4000,'M')
-
 GO
-
  
-
 INSERT Conjuge VALUES(1,'Renata',3000.00,'F')
-
 INSERT Conjuge VALUES(2,'Helena',5000.00,'F')
-
 INSERT Conjuge VALUES(3,'Daniel',6000.00,'M')
-
 INSERT Conjuge VALUES(4,'Tarcisio',1000.00,'M')
-
 INSERT Conjuge VALUES(5,'João Carlos',7000.00,'M')
-
 INSERT Conjuge VALUES(6,'Carla',9000.00,'M')
-
 INSERT Conjuge VALUES(7,'Ana Lucia',3000.00,'F')
-
  
-
 GO
-
 INSERT Endereco VALUES(1,1,1,'Rua Soraia - 29','Vila Santana',null)
-
 INSERT Endereco VALUES(2,1,1,'Rua Macunaima - 192','Jd.Europa',null)
-
 INSERT Endereco VALUES(1,1,2,'Rua Mariá - 342','Jd. Araguaia','Apto. 23')
-
 INSERT Endereco VALUES(2,2,2,'Rua Juca - 542','Vila Catarina ','Apto. 2')
-
 INSERT Endereco VALUES(2,2,3,'Pça Marcondes - 542','Vila Tereza ',null)
-
 INSERT Endereco VALUES(3,1,4,'Rua Santa Catarina - 1342','Vila Osvaldo Cruz',null)
-
 INSERT Endereco VALUES(1,1,1,'Av. Imirim, 325','Vila Vilma',null)
-
 INSERT Endereco VALUES(1,1,2,'Rua Clélia, 456','Vila Zoraide',null)
-
 INSERT Endereco VALUES(1,1,3,'Rua Pio XI, 938','Jd. América',null)
-
 INSERT Endereco VALUES(2,1,4,'Travessa 15, 1200','Vila Sonia',null)
-
 INSERT Endereco VALUES(2,2,5,'Av. Sodré, 392','Jd. Carnaúba',null)
-
 INSERT Endereco VALUES(2,3,6,'Av Mutinga, 200','Parque das Flores',null)
-
 INSERT Endereco VALUES(3,2,7,'Rua Cons. Ribas 594','Parque Municipal',null)
-
 INSERT Endereco VALUES(3,2,8,'Rua Maria Belido', 'Parque Industrial',null)
-
 INSERT Endereco VALUES(3,2,9,'Rua Avai 164','Vila Maria',null)
-
 INSERT Endereco VALUES(4,2,10,'Rua Bororós, 67','Vila Santa Terezinha',null)
-
 INSERT Endereco VALUES(4,2,11,'Rua Jose Pereira, 340','Zona da Mata',null)
-
 INSERT Endereco VALUES(4,3,12,'Av. Casa Verde, 450','Jd. Botucatu',null)
-
 INSERT Endereco VALUES(4,4,13,'Av Dr Gouveia, 392','Jd. Moricatupotá',null)
-
 INSERT Endereco VALUES(5,3,14,'Rua Lucena 184','Jd. Canhem BaBa',null)
-
 INSERT Endereco VALUES(5,3,15,'Av. Indianópolis 593','Vila Angela',null)
-
 INSERT Endereco VALUES(5,3,16,'Rua Alexandre Duma 486','Parque Piributa',null)
-
 INSERT Endereco VALUES(6,3,17,'Rua Maria Júlia 1207','Jd. Americanópolis',null)
-
 INSERT Endereco VALUES(6,3,18,'Rua Afonso Meira, 948','Parque Cruzeiro do Sul',null)
-
 INSERT Endereco VALUES(6,3,19,'Rua Bela Cintra 392','Vila Saturno',null)
-
 INSERT Endereco VALUES(6,4,20,'Rua Basilio 199','Jardim Jupter',null)
-
 INSERT Endereco VALUES(1,4,21,'Rua Doce 32','Praça Marte',null)
-
 INSERT Endereco VALUES(1,4,22,'Rua Grumix 114','Largo de Netuno',null)
-
 INSERT Endereco VALUES(1,4,23,'Rua Emilia 32','Area de Plutão',null)
-
 INSERT Endereco VALUES(1,4,24,'Al Jurupis 900','Vila Lua Branca',null)
-
 INSERT Endereco VALUES(1,4,25,'Av. Guedes 653','Parque Urano',null)
-
 INSERT Endereco VALUES(2,5,26,'Rua Neves 430','Jd. Paraiso',null)
-
 INSERT Endereco VALUES(2,5,27,'Av. Mario Zonta, 180','Terra Prometida',null)
-
 INSERT Endereco VALUES(2,5,28,'Rua Florida, 430','Jd. das Flores',null)
-
 INSERT Endereco VALUES(3,5,29,'Av. Jose Barroso, 305','Praça das Margaridas',null)
-
 INSERT Endereco VALUES(3,5,30,'Rua Mirina, 38','Zona Franca',null)
-
 INSERT Endereco VALUES(4,5,31,'Rua Iagaraí, 46','Jd. Brasileiro',null)
-
 INSERT Endereco VALUES(4,5,32,'Rua Paulista, 251','Jd. MMDC',null)
-
 INSERT Endereco VALUES(4,2,33,'Rua Salete, 320','Jd. Sales Garcia',null)
-
 INSERT Endereco VALUES(5,1,34,'Rua Souza, 115','Vila Sonia',null)
-
 INSERT Endereco VALUES(5,1,35,'Rua Alcion, 604','Parque Piraque',null)
-
 INSERT Endereco VALUES(5,1,36,'Av. Sabará, 987','Parque Piqueri',null)
-
 INSERT Endereco VALUES(6,2,37,'Rua Oscar Freire, 453','Parque Infantil',null)
-
 INSERT Endereco VALUES(6,2,38,'Av. Amaral Gama, 58','Jardim Judas',null)
-
 INSERT Endereco VALUES(6,2,39,'Rua Iru, 23','Jd. São Salvador',null)
-
 INSERT Endereco VALUES(1,2,40,'Rua Silvia, 560','Vila Pau Brasil',null)
-
 INSERT Endereco VALUES(1,2,41,'Rua Moura, 147','Vila Viela',null)
-
 INSERT Endereco VALUES(1,3,42,'Rua Aroeir, 954','Vila Amarela',null)
-
 INSERT Endereco VALUES(1,3,43,'Rua Pereira, 394','Vila Verde',null)
-
 INSERT Endereco VALUES(2,3,44,'Rua Galeão, 54','Vila Branca',null)
-
 GO
-
 INSERT Credito VALUES(1,1000.00,Getdate()-30)
-
 INSERT Credito VALUES(1,2000.00,Getdate()-29)
-
 INSERT Credito VALUES(1,3000.00,Getdate()-28)
-
 INSERT Credito VALUES(2,1000.00,Getdate()-27)
-
 INSERT Credito VALUES(3,1000.00,Getdate()-26)
-
 INSERT Credito VALUES(4,1000.00,Getdate()-25)
-
 INSERT Credito VALUES(5,1000.00,Getdate()-24)
-
 INSERT Credito VALUES(6,1000.00,Getdate()-23)
-
 INSERT Credito VALUES(7,1000.00,Getdate()-22)
-
 INSERT Credito VALUES(8,1000.00,Getdate()-21)
 
 INSERT Credito VALUES(9,1000.00,Getdate()-20)
