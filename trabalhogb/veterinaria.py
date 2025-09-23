@@ -43,14 +43,15 @@ def marcar_consulta():
         (?, ?, ?, 'agendada', ?);
         """
         cursor.execute(query_ins_con, (id_animal, id_veterinario, data_hora, valor_consulta))
+ 
+        cursor.close()
         
         if cursor.rowcount > 0:
             sqlite_connection.commit()
             print("consulta marcada com sucesso!")
-
-
-        cursor.close()
-
+        else :
+            sqlite_connection.rollback()
+ 
     except sqlite3.Error as error:
         sqlite_connection.rollback()
         print(f'error occurred {error}')
@@ -58,10 +59,9 @@ def marcar_consulta():
         if sqlite_connection:
             sqlite_connection.close()
 
-def main():
-    
-    marcar_consulta()
+
+
+marcar_consulta()
 
 
 
-main()
