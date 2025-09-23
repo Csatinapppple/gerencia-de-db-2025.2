@@ -51,7 +51,7 @@ CREATE TABLE consultas (
 	animal_id INTEGER NOT NULL,
 	veterinario_id INTEGER NOT NULL,
 	data_hora TEXT NOT NULL,
-	status TEXT NOT NULL DEFAULT 'agendadas' CHECK(status IN ('agendada','realizada','cancelada','no-show') ),
+	status TEXT NOT NULL DEFAULT 'agendada' CHECK(status IN ('agendada','realizada','cancelada','no-show') ),
 	motivo_cancelamento TEXT NULL,
 	observacoes TEXT,
 	valor_total REAL NOT NULL DEFAULT 0.00,
