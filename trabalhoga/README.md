@@ -5,8 +5,8 @@ Alunos: Christian Aguiar Plentz, Gerson Guilherme Schneider Monaco
 importe o database da aula2 exercicio2
 
 ```bash
-sqlite3 veterinaria.db < ../aula2/exercicio2/20_exercicios.sql
-sqlite3 veterinaria.db < ../aula2/exercicio2/insercoes.sql
+sqlite3 veterinaria.db < ../aula3/exercicio2/20_exercicios.sql
+sqlite3 veterinaria.db < ../aula3/exercicio2/insercoes.sql
 ```
 
 execute o programa python para marcacoes de consultas.
