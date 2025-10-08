@@ -1,0 +1,11 @@
+--50 Use LEAD() para prever próximo pagamento.
+--51 Aplique DENSE_RANK() para ranquear salários por departamento.
+--52 Use NTILE(4) para dividir clientes em quartis de gasto.
+--53 Calcule média móvel de 3 meses do faturamento.
+--54 Mostre participação (%) de cada produto no total da categoria.
+--55 Gere um slug de produto (minúsculo, com hífen).
+--56 Monte ID de pedido legível com ORD-AAAA-MM-id.
+--57 Mostre tempo médio entre order_date e shipped_date por shipper.
+--58 Monte relatório de pontualidade dos pedidos (ON_TIME ou LATE).
+--59 Liste funcionários com nome completo, anos de casa e salário reajustado.
+--60 Crie ranking de cidades por valor total comprado e ticket médio.
