@@ -1,0 +1,53 @@
+1. Qual tipo de arquitetura de banco de dados distribuído você escolheria para esse cenário? Justifique sua escolha.
+
+	Uma arquitetura híbrida, combinando banco de dados distribuído por fragmentação (sharding)
+	geográfica com replicação parcial e uma camada de cache distribuído, pode se ter
+	uma fragmentação por regiao que mantém os seus dados localmente.
+Justificativa:
+    Fragmentação por região/loja: Cada loja ou região mantém seus dados locais
+		(vendas, estoque local) em um nó local, reduzindo a latência para operações do dia a dia.
+   
+	 Replicação de dados críticos: Dados que precisam ser acessados globalmente
+		(como informações de produtos, preços, inventário global) são replicados de
+		forma assíncrona para um repositório central (data warehouse) e também para
+		uma CDN ou cache global para consultas rápidas.
+
+    Cache distribuído (ex: Redis, Memcached): Para dados de preços e estoque críticos,
+		um cache de baixa latência garante que todos os pontos de venda tenham acesso rápido
+		às informações mais recentes, mesmo em alta latência.
+    
+		Banco central para relatórios: Um data warehouse ou lake central agrega dados
+		de todas as lojas para relatórios globais, alimentado por streams de dados (ex: Kafka)
+		para não sobrecarregar o banco transacional.
+	Isso equilibra consistência, disponibilidade e desempenho, atendendo aos requisitos
+	de acesso local rápido e relatórios globais eficientes.
+
+
+2. Modelo de consistência eventual: impactos e mecanismos para minimizar problemas
+Impacto na experiência do cliente:
+    Um cliente pode ver um produto como disponível no sistema online, mas ao chegar na loja, o estoque local já foi vendido (estoque desatualizado).
+    Preços podem divergir temporariamente entre online e físico, ou entre regiões, causando confusão ou insatisfação.
+Mecanismos para minimizar problemas:
+    Versionamento de dados: Cada alteração de preço ou estoque recebe um timestamp ou versão; o sistema prioriza a versão mais recente quando detecta conflitos.
+    Cache com TTL baixo: Para dados críticos como preços, usar TTL curto (segundos) no cache para forçar atualização frequente.
+    Compensação e notificação: Se uma venda tentar usar estoque indisponível, o sistema emite um alerta e oferece alternativas (outra loja, desconto, etc.).
+    Sessões estritas para operações críticas: Para itens de alto valor ou estoque muito limitado, usar consistência forte apenas naquele item durante o processo de venda.
+3. Sincronização após interrupção prolongada de rede
+Para garantir que os dados coletados durante a queda de rede sejam sincronizados:
+    Armazenamento local resiliente: A loja afetada registra todas as transações localmente (banco embarcado + log de transações).
+    Fila de sincronização: Ao restabelecer a conexão, o sistema envia os dados em lotes, através de uma fila (ex: Apache Kafka, AWS Kinesis), para evitar sobrecarga.
+    Reconciliação por versões: O servidor central verifica timestamps e versões para aplicar as transações na ordem correta.
+    Detecção e resolução de conflitos: Se houver conflitos (ex: venda de mesmo produto em duas lojas com estoque 1), o sistema usa regras de negócio (ex: “primeiro a finalizar venda ganha”) e notifica a loja perdedora para ajuste.
+    Compensação: Se não for possível aplicar a transação (estoque insuficiente no sistema global), reverte-se localmente e notifica o cliente para acordo.
+4. Protocolo de sincronização distribuído para dados críticos
+Protocolo escolhido: Two-Phase Commit (2PC) ou Raft/Paxos para dados fortemente consistentes, dependendo da necessidade:
+    2PC para transações distribuídas ACID entre nós.
+    Raft para eleição de líder e replicação síncrona de logs em tempo real.
+Impacto no desempenho:
+    Aumento da latência em operações de escrita, pois exige confirmação síncrona de múltiplos nós antes de retornar ao cliente.
+    Possível redução de disponibilidade em caso de partição de rede (problema do CAP).
+Estratégias para reduzir latência de leitura:
+    Leituras no líder: Garantir que leituras críticas sejam feitas no nó líder para evitar inconsistências, mas usar cache no lado do cliente para dados menos voláteis.
+    Leituras de réplicas síncronas: Permitir leituras em réplicas que acompanham o líder em tempo real (leitura linearizável).
+    Bloom filters e índices distribuídos: Para acelerar buscas em grandes volumes.
+    Batching e pipeline: Agrupar confirmações para reduzir round trips em WAN.
