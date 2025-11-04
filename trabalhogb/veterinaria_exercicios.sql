@@ -208,3 +208,29 @@ WHERE con.status = 'realizada'
     AND con.data_hora < DATE_FORMAT(CURRENT_DATE, '%Y-%m-01')
 GROUP BY vet.id, vet.nome
 HAVING COUNT(con.id) > 5;  -- Altere 5 para o valor desejado
+
+-- Consulta para ver atendimentos realizados
+SELECT 
+    c.id as consulta_id,
+    a.nome as animal,
+    cl.nome as dono,
+    v.nome as veterinario,
+    c.data_hora,
+    c.valor_total
+FROM consultas c
+JOIN animais a ON c.animal_id = a.id
+JOIN clientes cl ON a.cliente_id = cl.id
+JOIN veterinarios v ON c.veterinario_id = v.id
+WHERE c.status = 'realizada'
+ORDER BY c.data_hora DESC;
+
+-- Faturamento por veterinário
+SELECT 
+    v.nome as veterinario,
+    COUNT(c.id) as total_consultas,
+    SUM(c.valor_total) as faturamento_total
+FROM consultas c
+JOIN veterinarios v ON c.veterinario_id = v.id
+WHERE c.status = 'realizada'
+GROUP BY v.id, v.nome
+ORDER BY faturamento_total DESC;
