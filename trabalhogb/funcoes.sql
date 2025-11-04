@@ -1,49 +1,46 @@
+USE clinica_vet;
+
+DROP FUNCTION IF EXISTS calcular_saldo_restante;
+
 CREATE FUNCTION calcular_saldo_restante(consulta_id_param INT) 
 RETURNS DECIMAL(10,2)
 READS SQL DATA
 DETERMINISTIC
-BEGIN
-    DECLARE valor_total_consulta DECIMAL(10,2);
-    DECLARE total_pago DECIMAL(10,2);
-    DECLARE saldo_restante DECIMAL(10,2);
-    
-    -- Pega o valor total da consulta
-    SELECT valor_total INTO valor_total_consulta 
-    FROM consultas 
-    WHERE id = consulta_id_param;
-    
-    -- Pega o valor total ja pago
-    SELECT COALESCE(SUM(valor), 0) INTO total_pago 
-    FROM pagamentos 
-    WHERE consulta_id = consulta_id_param 
-    AND status = 'pago';
-    
-    SET saldo_restante = valor_total_consulta - total_pago;
-    
-    IF saldo_restante < 0 THEN
-        SET saldo_restante = 0;
-    END IF;
-    
-    RETURN saldo_restante;
-END;
+RETURN (
+    SELECT COALESCE(
+        GREATEST(c.valor_total - SUM(p.valor), 0),
+        c.valor_total
+    )
+    FROM consultas c
+    LEFT JOIN pagamentos p ON c.id = p.consulta_id AND p.status = 'pago'
+    WHERE c.id = consulta_id_param
+    GROUP BY c.id, c.valor_total
+);
 
-CREATE TRIGGER before_insert_pagamento
+DELIMITER ;
+
+--#BEGIN
+DELIMITER //
+CREATE TRIGGER before_insert_pagamentos
 BEFORE INSERT ON pagamentos
 FOR EACH ROW
 BEGIN
-    DECLARE saldo_restante DECIMAL(10,2);
-    
-    IF NEW.status = 'pago' THEN
-        SET saldo_restante = calcular_saldo_restante(NEW.consulta_id);
+	DECLARE saldo_restante DECIMAL(10,2);
+
+	IF NEW.status = 'pago' THEN
+		SET saldo_restante = calcular_saldo_restante(NEW.consulta_id);
         
-        IF NEW.valor > saldo_restante THEN
+		IF NEW.valor > saldo_restante THEN
 			-- se o valor for maior que o restante então vai se acumular no restante
-            SET NEW.valor = saldo_restante;
-        END IF;
-    END IF;
-END;
+			SET NEW.valor = saldo_restante;
+		END IF;
+	END IF;
+END//
+DELIMITER ;
+--#END
 
-
+--#BEGIN
+DELIMITER //
 CREATE TRIGGER before_update_pagamento
 BEFORE UPDATE ON pagamentos
 FOR EACH ROW
@@ -58,4 +55,23 @@ BEGIN
             SET NEW.valor = saldo_restante;
         END IF;
     END IF;
-END;
+END//
+DELIMITER ;
+--#END
+
+-- Teste dos triggers
+INSERT INTO clinica_vet.consultas
+(animal_id, veterinario_id, data_hora, status, valor_total)
+VALUES(1, 1, CURRENT_TIMESTAMP, 'realizada', 70.00);
+
+INSERT INTO clinica_vet.pagamentos 
+(consulta_id, data_pagto , metodo , status , valor)
+VALUES (7, CURRENT_TIMESTAMP, 'pix', 'pago', 100.00)
+
+INSERT INTO clinica_vet.pagamentos 
+(consulta_id, data_pagto , metodo , status , valor)
+VALUES (8, CURRENT_TIMESTAMP, 'pix', 'pendente', 100.00)
+
+UPDATE clinica_vet.pagamentos p
+SET p.status = 'pago'
+WHERE p.id = 7;

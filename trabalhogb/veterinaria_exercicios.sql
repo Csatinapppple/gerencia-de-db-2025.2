@@ -1,3 +1,5 @@
+USE clinica_vet;
+
 --1. Listar todos os clientes cadastrados (nome, telefone, email), ordenados por nome.
 SELECT nome, telefone, email 
 FROM clientes
