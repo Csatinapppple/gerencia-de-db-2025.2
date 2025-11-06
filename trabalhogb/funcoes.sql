@@ -66,12 +66,12 @@ VALUES(1, 1, CURRENT_TIMESTAMP, 'realizada', 70.00);
 
 INSERT INTO clinica_vet.pagamentos 
 (consulta_id, data_pagto , metodo , status , valor)
-VALUES (7, CURRENT_TIMESTAMP, 'pix', 'pago', 100.00)
+VALUES (9, CURRENT_TIMESTAMP, 'pix', 'pago', 100.00)
 
 INSERT INTO clinica_vet.pagamentos 
 (consulta_id, data_pagto , metodo , status , valor)
-VALUES (8, CURRENT_TIMESTAMP, 'pix', 'pendente', 100.00)
+VALUES (10, CURRENT_TIMESTAMP, 'pix', 'pendente', 100.00)
 
 UPDATE clinica_vet.pagamentos p
 SET p.status = 'pago'
-WHERE p.id = 7;
+WHERE p.id = 10;
