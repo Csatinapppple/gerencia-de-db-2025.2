@@ -229,10 +229,9 @@ ORDER BY c.data_hora DESC;
 -- Faturamento por veterinário
 SELECT 
     v.nome as veterinario,
-    COUNT(c.id) as total_consultas,
-    SUM(c.valor_total) as faturamento_total
+    COUNT(CASE WHEN c.status = 'realizada' THEN c.id ELSE NULL END) as total_consultas,
+    SUM(CASE WHEN c.status = 'realizada' THEN c.valor_total ELSE 0 END) as faturamento_total
 FROM consultas c
 JOIN veterinarios v ON c.veterinario_id = v.id
-WHERE c.status = 'realizada'
 GROUP BY v.id, v.nome
 ORDER BY faturamento_total DESC;
