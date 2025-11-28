@@ -1,0 +1,82 @@
+Christian Aguiar Plentz, Gerson Guilherme
+BLOCO 1:
+	1. Chave-Valor
+	2. Documento
+	3. Colunar
+	4. Grafos
+	5. Colunar
+	6. Chave-Valor
+	7. Chave-Valor
+	8. Colunar
+	9. Documento
+	10. Grafos
+
+BLOCO 2:
+	1. CP ACID
+	2. AP BASE
+	3. AP BASE
+	4. CP ACID
+	5. AP BASE
+
+BLOCO 3:
+	Documento JSON para restaurante:
+	{
+		"_id": ObjectId("..."),
+		"nome": "Restaurante Exemplo",
+		"cnpj": "12.345.678/0001-99",
+		"telefone": "(11) 99999-9999",
+		"categoria": ["Italiana", "Pizza"],
+		"cardapio": [
+			{
+				"categoria_item": "Pratos Principais",
+				"itens": [
+					{
+						"nome": "Pizza Margherita",
+						"descricao": "Molho de tomate, mussarela, manjericão",
+						"preco": 45.90,
+						"disponivel": true
+					}
+				]
+			}
+		],
+		"localizacao": {
+			"type": "Point",
+			"coordinates": [-46.632388, -23.550520]
+		},
+		"avaliacoes": [
+			{
+				"usuario_id": ObjectId("..."),
+				"nota": 5,
+				"comentario": "Excelente!",
+				"data": ISODate("2024-09-20")
+			}
+		],
+		"horario_funcionamento": {
+			"segunda": {"abertura": "11:00", "fechamento": "23:00"},
+			"terca": {"abertura": "11:00", "fechamento": "23:00"}
+		},
+		"historico_alteracoes": [
+			{
+				"data_alteracao": ISODate("2024-09-20"),
+				"campo_alterado": "cardapio",
+				"valor_anterior": "..."
+			}
+		]
+	}
+
+
+1. Por que o MongoDB possui uma estrutura flexivel com os JSONs permitindo por um array
+de objetos em uma entrada no banco.
+2. Items como o GeoJSON seriam complicados em fazer no Relacional pois dentro dele se tem
+um Objeto que pode ser de varios tipos
+3. Podemos dar identificadores proprios para cada entrada no banco para serem juntados
+numa query de mongoDB ou usar o ObjectId denominado a cada entrada
+
+BLOCO 4:
+	Sessões: Chave-Valor
+	Posts: Documento 
+	Comentarios: Documento
+	Timeline: Colunar
+	Likes: Chave-Valor
+	Busca: Elasticsearch
+	Relacoes: Grafo
